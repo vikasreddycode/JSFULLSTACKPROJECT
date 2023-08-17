@@ -38,4 +38,36 @@ res.status(200).json({
    user,
 })
  })
+ export const login = asynchandler(async(req,res) => {
+   const {email,password} = req.body;
+   if(!email || !password){
+      throw new Customerror("please fill all the details",400)
+   }
+   const user = User.findOne({email}).select("+password")
+   if(!user){
+      throw new Customerror("Invalid crdentials",400)
+   }
+   const ispasswordmatched = user.comparepassword(password);
+   if(ispasswordmatched){
+      const token = user.getJWToken()
+      user.password = undefined;
+      res.cookie("token",token,cookieOptions)
+      return res.status(200).json({
+         success:true,
+         token,
+         user
+      })
+   }
+   throw new Customerror("password is incorrect",400)
 
+ })
+ export const logout = asynchandler(asynchandler(async (req,res) => {
+   res.cookie("token",null,{
+      expires: new Date(Date.now()),
+      httpOnly:true
+   });
+   res.status(200).json({
+      success:true,
+      message:"Logout"
+ })
+}))

@@ -1,4 +1,5 @@
 const asynchandler = (func) => async(req,res,next) => {
+    //next middleware flag used to stop in between
 try{
 await func(req,res,next)
 }
